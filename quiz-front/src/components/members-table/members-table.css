@@ -1,0 +1,44 @@
+.members-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  background-color: white;
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.members__list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 500px;
+  background-color: aquamarine;
+}
+
+.members__item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 80px;
+  border: 2px solid rgba(39, 87, 161, 1);
+  border-radius: 20px;
+  padding: 10px;
+  gap: 10px;
+}
+
+.members__profile-circle {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(39, 87, 161, 1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.members__profile-info {
+  display: flex;
+  flex-direction: column;
+}
