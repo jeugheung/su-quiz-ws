@@ -1,40 +1,53 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './question-table.css'
 
-const QuestionTable = () => {
+const QuestionTable = ({setGameQuestion}) => {
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
 
-  const handleQuestionClick = () => {
-    console.log('click')
-  }
+  const questions = [
+    {
+      category: "Цвета",
+      questions: [
+        { id: 1, question_kz: "Какой ваш любимый цвет?", question_ru: "Какой ваш любимый цвет?", points: 10 },
+        { id: 2, question_kz: "Какого цвета море?", question_ru: "Какого цвета море?", points: 20 },
+        // Другие вопросы в этой категории
+      ]
+    },
+    {
+      category: "Возраст",
+      questions: [
+        { id: 3, question_kz: "Сколько вам лет?", question_ru: "Сколько вам лет?", points: 5 },
+        // Другие вопросы в этой категории
+      ]
+    },
+    // Другие категории
+  ];
+  
+  const handleQuestionClick = (question) => {
+    setGameQuestion(question);
+    setSelectedQuestion(question)
+    // Дальнейшая обработка клика на вопрос
+  };
+
   return (
     <div className='question-table'>
-      <div className='question-table__content-container'>
-        <span className='question-table__main-title'>Числа</span>
-        <div className='question-table__question-stack'>
-          <div className='question-table__question-item' onClick={handleQuestionClick}>
-            <span>10</span>
-            <span>баллов</span>
-          </div>
-          <div className='question-table__question-item'>
-            <span>20</span>
-            <span>баллов</span>
-          </div>
-        </div>
-      </div>
-
-      <div className='question-table__content-container'>
-        <span className='question-table__main-title'>Сатпаев</span>
-        <div className='question-table__question-stack'>
-          <div className='question-table__question-item'>
-            <span>10</span>
-            <span>баллов</span>
-          </div>
-          <div className='question-table__question-item'>
-            <span>20</span>
-            <span>баллов</span>
+      {questions.map((category) => (
+        <div key={category.category} className='question-table__content-container'>
+          <span className='question-table__main-title'>{category.category}</span>
+          <div className='question-table__question-stack'>
+            {category.questions.map((question) => (
+              <div
+                key={question.id}
+                className={`question-table__question-item ${selectedQuestion && selectedQuestion.id === question.id ? 'selected' : ''}`}
+                onClick={() => handleQuestionClick(question)}
+              >
+                <span>{question.points}</span>
+                <span>баллов</span>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      ))}
     </div>
   );
 }

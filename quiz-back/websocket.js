@@ -13,6 +13,9 @@ wss.on('connection', function connection(ws) {
       case 'message': 
         broadcastMessage(message)
         break;
+      case 'start_game': 
+        broadcastMessage(message)
+        break
       case 'connection':
         broadcastMessage(message)
         break;

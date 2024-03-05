@@ -6,13 +6,14 @@ import QuestionTable from '../../components/question-table/question-table';
 import { useWebSocket } from '../../shared/WebSocketContext';
 
 const AdminDashboardPage = () => {
+  const [gameQuestion, setGameQuestion] = useState(null);
   const [messages, setMessages] = useState([]);
   const socket = useWebSocket();
 
+
+
   useEffect(() => {
-    
     if (socket) {
-      
       socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
         console.log(message)
@@ -21,12 +22,26 @@ const AdminDashboardPage = () => {
     }
   }, [socket]);
 
+  const handleStartGame = () => {
+    console.log('Selected question:', gameQuestion);
+    if (socket && gameQuestion) {
+      const message = {
+        event: "start_game",
+        question: gameQuestion
+      };
+      socket.send(JSON.stringify(message));
+    }
+  };
+
   return (
     <main className='dashboard'>
       <Header />
       <div className='dashboard__container'>
         <MembersTable members={messages}/>
-        <QuestionTable />
+        <div className='dashboard__tableview'>
+          <QuestionTable setGameQuestion={setGameQuestion}/>
+          <button className='dashboard__button' onClick={handleStartGame}>Начать игру</button>
+        </div>
       </div>
     </main>
   );

@@ -1,14 +1,8 @@
 .question-table {
   display: flex;
   flex-direction: column;
-  gap: 10px
-  ;
-  max-width: 1100px;
-  width: 100%;
-  min-height: 100vh;
-  background-color: white;
-  border-radius: 15px;
-  padding: 20px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .question-table__content-container {
@@ -48,4 +42,24 @@
 
 .question-table__question-item:hover {
   background: rgba(88, 152, 250, 1);
+}
+
+.question-table__button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(63, 161, 39, 1);
+  color: white;
+  border: 0;
+  border-radius: 15px;
+  height: 76px;
+  font-size: 30px;
+  line-height: 35px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.question-table__question-item.selected {
+  background-color: rgba(88, 152, 250, 1);
 }
