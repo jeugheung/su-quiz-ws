@@ -4,13 +4,13 @@ import Header from '../../components/header/header';
 import MembersTable from '../../components/members-table/members-table';
 import QuestionTable from '../../components/question-table/question-table';
 import { useWebSocket } from '../../shared/WebSocketContext';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboardPage = () => {
   const [gameQuestion, setGameQuestion] = useState(null);
   const [messages, setMessages] = useState([]);
   const socket = useWebSocket();
-
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (socket) {
@@ -30,6 +30,7 @@ const AdminDashboardPage = () => {
         question: gameQuestion
       };
       socket.send(JSON.stringify(message));
+      navigate('/admin-answers')
     }
   };
 

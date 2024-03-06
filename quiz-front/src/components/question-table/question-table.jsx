@@ -8,15 +8,15 @@ const QuestionTable = ({setGameQuestion}) => {
     {
       category: "Цвета",
       questions: [
-        { id: 1, question_kz: "Какой ваш любимый цвет?", question_ru: "Какой ваш любимый цвет?", points: 10 },
-        { id: 2, question_kz: "Какого цвета море?", question_ru: "Какого цвета море?", points: 20 },
+        { id: 1, question_kz: "Какой ваш любимый цвет?", question_ru: "Какой ваш любимый цвет?", points: 10, category: 'Цвета' },
+        { id: 2, question_kz: "Какого цвета море?", question_ru: "Какого цвета море?", points: 20, category: 'Цвета' },
         // Другие вопросы в этой категории
       ]
     },
     {
       category: "Возраст",
       questions: [
-        { id: 3, question_kz: "Сколько вам лет?", question_ru: "Сколько вам лет?", points: 5 },
+        { id: 3, question_kz: "Сколько вам лет?", question_ru: "Сколько вам лет?", points: 5, category: 'Возраст' },
         // Другие вопросы в этой категории
       ]
     },

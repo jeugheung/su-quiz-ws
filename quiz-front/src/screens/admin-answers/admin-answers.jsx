@@ -1,14 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import './user-game-page.css'
+import React, {useState, useEffect} from 'react';
+// import './admin-dashboard.css'
+import './admin-answers.css'
 import Header from '../../components/header/header';
-import { useWebSocket } from '../../shared/WebSocketContext';
 import MembersTable from '../../components/members-table/members-table';
+import { useWebSocket } from '../../shared/WebSocketContext';
 
-const UserGamePage = () => {
+const AdminAnswersPage = () => {
   const [members, setMembers] = useState([]);
   const [question, setQuestion] = useState();
-  const [currentUser, setCurrentUser] = useState()
-  const [answerSubmitted, setAnswerSubmitted] = useState(false);
+  const [answers, setAnswers] = useState()
+  const [topList, setTopList] = useState([])
   const socket = useWebSocket();
 
   useEffect(() => {
@@ -18,16 +19,18 @@ const UserGamePage = () => {
       socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
         console.log(message)
-        if (message.event == 'connection') {
+        if (message.event === 'connection') {
           console.log('connection')
           console.log('CURRENT USER', message)
-          setCurrentUser(message)
           setMembers(prevMessages => [...prevMessages, message]);
-        } else if (message.event == 'start_game') {
+        } else if (message.event === 'start_game') {
           setQuestion(message.question)
           console.log('start_game----', question)
         } else if (message.event === 'user_answer') {
-          alert('OTVER')
+          console.log('ANSWER ---- ', message.user.username)
+          setAnswers(message.user.username)
+          console.log('SETTING ANSWER---', answers)
+          setTopList(prevMessages => [...prevMessages, message]);
         }
         
         // Обработка входящего сообщения
@@ -35,19 +38,6 @@ const UserGamePage = () => {
     }
   }, [socket]);
 
-  const handleAnswerClick = () => {
-    // console.log('Selected question:', gameQuestion);
-    if (socket && question) {
-      const message = {
-        event: "user_answer",
-        question: question,
-        user: currentUser
-      };
-      console.log(message)
-      socket.send(JSON.stringify(message));
-      setAnswerSubmitted(true);
-    }
-  }
 
   return (
     <main className='user-game'>
@@ -63,10 +53,16 @@ const UserGamePage = () => {
                 <span className='user-game__task'>{question.question_kz}</span>
                 <span className='user-game__task'>{question.question_ru}</span>
               </div>
-              {answerSubmitted ? (
-                <button className='user-game__reply-btn__submitted' disabled>Вы ответили</button>
+              {answers ? (
+                <div className='answers__answer-block'>
+                  <span className='answers__answer-title'>Отвечает: {answers}</span>
+                  <div className='answers__btn-stack'>
+                    <button className='answers__btn-correct'>Правильно</button>
+                    <button className='answers__btn-incorrect'>Неправильно</button>
+                  </div>
+                </div>
               ) : (
-                <button className='user-game__reply-btn' onClick={handleAnswerClick}>Ответить</button>
+                <div className='admin-answers__reply-btn'>Ожидайте ответа участников</div>
               )}
             </div>
           ) : (
@@ -74,10 +70,14 @@ const UserGamePage = () => {
               <span>Ожидайте ответа администратора</span>
             </div>
           )}
+          <div className='user-game__top-table'>
+            <span>{topList}</span>
+          </div>
+
         </div>
       </div>
     </main>
   );
 }
 
-export default UserGamePage;
+export default AdminAnswersPage;
