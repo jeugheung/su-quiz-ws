@@ -5,9 +5,8 @@ import formLogo from '../../assets/formLogo.png'
 import { useNavigate } from 'react-router-dom';
 
 const AdminSignIn = () => {
-  const navigate = useNavigate(); // Инициализация объекта истории для перехода по маршрутам
+  const navigate = useNavigate();
 
-  // Состояния для логина и пароля
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
 
@@ -23,10 +22,8 @@ const AdminSignIn = () => {
   const handleSignIn = () => {
     // Проверка на соответствие логина и пароля
     if (login === 'admin' && password === 'admin') {
-      // Переход на маршрут /dashboard
-      navigate('/admin-dashboard');
+      navigate('/admin-start');
     } else {
-      // Вывод сообщения об ошибке или другая логика при неправильном логине или пароле
       alert('Неправильный логин или пароль');
     }
   };

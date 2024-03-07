@@ -10,16 +10,6 @@ const UserSignIn = () => {
   const navigate = useNavigate();
   const socket = useRef();
 
-  // const sendMessage = () => {
-  //   const message = {
-  //     username,
-  //     date: Date.now(),
-  //     event: 'message'
-  //   }
-
-  //   socket.current.send(JSON.stringify(message));
-  // }
-
   const userConnection = () => {
     socket.current = new WebSocket("ws://localhost:5002");
     socket.current.onopen = () => {
@@ -37,9 +27,7 @@ const UserSignIn = () => {
       // const message = JSON.parse(event.data);
       // setMessages((prev) => [message, ...prev]);
     };
-    socket.current.onclose = () => {
-      console.log("Socket закрыт");
-    };
+
     socket.current.onerror = () => {
       console.log("Socket произошла ошибка");
     };

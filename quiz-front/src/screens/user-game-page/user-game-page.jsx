@@ -18,11 +18,13 @@ const UserGamePage = () => {
       socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
         console.log(message)
+        // eslint-disable-next-line eqeqeq
         if (message.event == 'connection') {
           console.log('connection')
           console.log('CURRENT USER', message)
           setCurrentUser(message)
           setMembers(prevMessages => [...prevMessages, message]);
+        // eslint-disable-next-line eqeqeq
         } else if (message.event == 'start_game') {
           setQuestion(message.question)
           console.log('start_game----', question)

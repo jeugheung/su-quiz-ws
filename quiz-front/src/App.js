@@ -6,6 +6,7 @@ import AdminPage from './screens/admin/admin-page';
 import AdminDashboardPage from './screens/admin-dashboard/admin-dashboard'
 import UserGamePage from './screens/user-game-page/user-game-page';
 import AdminAnswersPage from './screens/admin-answers/admin-answers';
+import AdminStartPage from './screens/admin-start/admin-start';
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="admin" element={<AdminPage />} />
+          <Route path='admin-start' element={<AdminStartPage />} />
           <Route path="admin-dashboard" element={<AdminDashboardPage />} />
           <Route path='user-game' element={<UserGamePage />} />
           <Route path='admin-answers' element={<AdminAnswersPage />} />

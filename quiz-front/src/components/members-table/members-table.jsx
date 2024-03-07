@@ -11,10 +11,10 @@ const MembersTable = ({members}) => {
         {members.map((mess) => (
           (mess.event === "connection") && (
             <div key={mess.id} className="members__item">
-              <div className='members__profile-circle'>{mess.username[0]}</div>
+              <div className={`members__profile-circle ${mess.id === 'admin' ? 'profile-circle__admin' : ''}`}>{mess.username[0]}</div>
               <div className='members__profile-info'>
                 <span className='members__username'>{mess.username}</span>
-                <span>Количество баллов</span>
+                {mess.id !== 'admin' && <span>Количество баллов</span>}
               </div>
             </div>
           )
