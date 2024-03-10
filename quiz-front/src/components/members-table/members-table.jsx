@@ -1,8 +1,28 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './members-table.css'
+import axios from 'axios';
 
 const MembersTable = ({members}) => {
   console.log('MEMBERS',members)
+
+  // useEffect(() => {
+  //   // Функция для выполнения GET-запроса к серверу
+  //   const fetchMembers = async () => {
+  //     try {
+  //       // Выполняем GET-запрос к /users на локальном сервере
+  //       const response = await axios.get('http://localhost:5002/users');
+  //       console.log('USERS RESP', response)
+  //     } catch (error) {
+  //       console.error('Error fetching members:', error);
+  //     }
+  //   };
+
+  //   // Вызываем функцию для загрузки участников при монтировании компонента
+  //   fetchMembers();
+
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
   return (
     <div className='members-table'>
       <h2 className='members__main-title'>Участники</h2>

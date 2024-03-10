@@ -1,27 +1,24 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import axios from 'axios';
 import './question-table.css'
 
 const QuestionTable = ({setGameQuestion}) => {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [questions, setQuestions] = useState([])
 
-  const questions = [
-    {
-      category: "Цвета",
-      questions: [
-        { id: 1, question_kz: "Какой ваш любимый цвет?", question_ru: "Какой ваш любимый цвет?", points: 10, category: 'Цвета' },
-        { id: 2, question_kz: "Какого цвета море?", question_ru: "Какого цвета море?", points: 20, category: 'Цвета' },
-        // Другие вопросы в этой категории
-      ]
-    },
-    {
-      category: "Возраст",
-      questions: [
-        { id: 3, question_kz: "Сколько вам лет?", question_ru: "Сколько вам лет?", points: 5, category: 'Возраст' },
-        // Другие вопросы в этой категории
-      ]
-    },
-    // Другие категории
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5002/questions'); // Замените на ваш путь к GET-запросу
+        console.log('data from resp',response)
+        setQuestions(response.data)
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
   
   const handleQuestionClick = (question) => {
     setGameQuestion(question);

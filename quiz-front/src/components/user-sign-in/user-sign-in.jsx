@@ -3,12 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import './user-sign-in.css';
 import suLogo from '../../assets/suLogo.png'
 import formLogo from '../../assets/formLogo.png'
+import axios from 'axios';
 
 const UserSignIn = () => {
   const [username, setUsername] = useState("");
   const [connected, setConnected] = useState(false);
   const navigate = useNavigate();
   const socket = useRef();
+  const newUser = {
+    username: 'example_user',
+    points: 100,
+    room_id: 'example_room'
+  };
 
   const userConnection = () => {
     socket.current = new WebSocket("ws://localhost:5002");
@@ -21,7 +27,15 @@ const UserSignIn = () => {
         id: Date.now(),
       };
       socket.current.send(JSON.stringify(message));
-      navigate('/user-game');
+      axios.post('http://localhost:5002/users', newUser)
+      .then(response => {
+        console.log('User created:', response.data);
+        navigate('/user-game');
+      })
+      .catch(error => {
+        console.error('Error creating user:', error.response.data);
+      });
+      
     };
     socket.current.onmessage = (event) => {
       // const message = JSON.parse(event.data);
