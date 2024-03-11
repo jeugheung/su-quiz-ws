@@ -5,22 +5,12 @@ import MembersTable from '../../components/members-table/members-table';
 import QuestionTable from '../../components/question-table/question-table';
 import { useWebSocket } from '../../shared/WebSocketContext';
 import { useNavigate } from 'react-router-dom';
+import GameHeader from '../../components/game-header/game-header';
 
 const AdminDashboardPage = () => {
   const [gameQuestion, setGameQuestion] = useState(null);
-  const [messages, setMessages] = useState([]);
   const socket = useWebSocket();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (socket) {
-      socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        console.log(message)
-        setMessages(prevMessages => [...prevMessages, message]);
-      };
-    }
-  }, [socket]);
 
   const handleStartGame = () => {
     console.log('Selected question:', gameQuestion);
@@ -38,10 +28,13 @@ const AdminDashboardPage = () => {
     <main className='dashboard'>
       <Header />
       <div className='dashboard__container'>
-        <MembersTable members={messages}/>
-        <div className='dashboard__tableview'>
-          <QuestionTable setGameQuestion={setGameQuestion}/>
-          <button className='dashboard__button' onClick={handleStartGame}>Начать игру</button>
+        <GameHeader />
+        <div className='dashboard__content'>
+          <MembersTable/>
+          <div className='dashboard__tableview'>
+            <QuestionTable setGameQuestion={setGameQuestion}/>
+            <button className='dashboard__button' onClick={handleStartGame}>Начать игру</button>
+          </div>
         </div>
       </div>
     </main>

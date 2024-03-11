@@ -3,6 +3,7 @@ import './admin-start.css'
 import Header from '../../components/header/header';
 // import { useWebSocket } from '../../shared/WebSocketContext';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AdminStartPage = () => {
   const socket = useRef();
@@ -16,27 +17,45 @@ const AdminStartPage = () => {
     return result;
   }
   
-  const handleStartGame = () => {
-    socket.current = new WebSocket("ws://localhost:5002");
-    socket.current.onopen = () => {
-      console.log('Connected')
-      const message = {
-        event: "connection",
-        username: `Администратор ${generateRandomDigits()}`,
-        id: 'admin',
-        room_id: generateRandomDigits()
-      };
-      socket.current.send(JSON.stringify(message));
-      navigate(`/admin-dashboard?roomId=${generateRandomDigits()}`)
-    };
-    socket.current.onmessage = (event) => {
-      // const message = JSON.parse(event.data);
-      // setMessages((prev) => [message, ...prev]);
+  const handleStartGame = async  () => {
+    const roomId = generateRandomDigits(); // Ваш ID комнаты
+    const gameData = {
+      current_question_ru: '',
+      current_question_kz: '',
+      question_id: 0,
+      game_step: 0
     };
 
-    socket.current.onerror = () => {
-      console.log("Socket произошла ошибка");
-    };
+    try {
+      const response = await axios.post('http://localhost:5002/games', {
+        room_id: roomId,
+        gameData: gameData
+      });
+      console.log('Game data saved:', response.data);
+      navigate(`/admin-dashboard?roomId=${roomId}`)
+    } catch (error) {
+      console.error('Error saving or updating game data:', error);
+    }
+    // socket.current = new WebSocket("ws://localhost:5002");
+    // socket.current.onopen = () => {
+    //   console.log('Connected')
+    //   const message = {
+    //     event: "connection",
+    //     username: `Администратор ${generateRandomDigits()}`,
+    //     id: 'admin',
+    //     room_id: generateRandomDigits()
+    //   };
+    //   socket.current.send(JSON.stringify(message));
+    //   navigate(`/admin-dashboard?roomId=${generateRandomDigits()}`)
+    // };
+    // socket.current.onmessage = (event) => {
+    //   // const message = JSON.parse(event.data);
+    //   // setMessages((prev) => [message, ...prev]);
+    // };
+
+    // socket.current.onerror = () => {
+    //   console.log("Socket произошла ошибка");
+    // };
   }
 
 

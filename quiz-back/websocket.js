@@ -3,7 +3,8 @@ const ws = require('ws');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Question = require('./models/question-model');
-const User = require('./models/user-model')
+const User = require('./models/user-model');
+const GameData = require('./models/game-model');
 
 const app = express();
 
@@ -86,19 +87,85 @@ app.get('/questions', async (req, res) => {
 
 app.post('/users', async (req, res) => {
   try {
-    // Создание нового пользователя на основе данных из тела запроса
-    const newUser = new User({
-      username: req.body.username,
-      points: req.body.points,
-      room_id: req.body.room_id
-    });
+    // Проверяем, существует ли пользователь с данным room_id
+    const existingUser = await User.findOne({ room_id: req.body.room_id });
 
-    // Сохранение пользователя в базу данных
-    const savedUser = await newUser.save();
+    if (existingUser) {
+      // Если пользователь существует, добавляем нового пользователя в массив userData
+      existingUser.userData.push({
+        username: req.body.username,
+        points: req.body.points,
+        user_id: req.body.id
+      });
 
-    res.status(201).json(savedUser); // Отправляем созданного пользователя обратно в ответе
+      // Сохраняем обновленного пользователя
+      const savedUser = await existingUser.save();
+      res.status(201).json(savedUser);
+    } else {
+      // Если пользователь не существует, создаем нового пользователя
+      const newUser = new User({
+        room_id: req.body.room_id,
+        userData: [{
+          username: req.body.username,
+          points: req.body.points,
+          user_id: req.body.id
+        }]
+      });
+
+      // Сохраняем нового пользователя в базу данных
+      const savedUser = await newUser.save();
+      res.status(201).json(savedUser);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+app.get('/users/:room_id', async (req, res) => {
+  try {
+    const users = await User.findOne({ room_id: req.params.room_id });
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.post('/games', async (req, res) => {
+  try {
+    const { room_id, gameData } = req.body;
+    let existingGameData = await GameData.findOne({ room_id });
+
+    if (!existingGameData) {
+      // Если данных для данной комнаты еще нет, создаем новую запись
+      existingGameData = new GameData({ room_id, gameData });
+    } else {
+      // Если данные уже существуют, обновляем их
+      existingGameData.gameData = gameData;
+    }
+
+    const savedGameData = await existingGameData.save();
+    res.status(201).json(savedGameData);
+  } catch (error) {
+    console.error('Error creating or updating game data:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.get('/games/:roomId', async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const gameData = await GameData.findOne({ room_id: roomId });
+    if (!gameData) {
+      return res.status(404).json({ message: 'Game data not found' });
+    }
+    res.json(gameData);
+  } catch (error) {
+    console.error('Error fetching game data:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+

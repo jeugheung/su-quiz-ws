@@ -43,7 +43,6 @@ const AdminAnswersPage = () => {
     <main className='user-game'>
       <Header />
       <div className='user-game__container'>
-        <MembersTable members={members}/>
         <div className='user-game__question-container'>
           {question ? (
             <div className='user-game__question'>

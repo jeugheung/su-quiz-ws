@@ -8,15 +8,25 @@ import axios from 'axios';
 const UserSignIn = () => {
   const [username, setUsername] = useState("");
   const [connected, setConnected] = useState(false);
+  const [roomId, setRoomId] = useState();
   const navigate = useNavigate();
   const socket = useRef();
-  const newUser = {
-    username: 'example_user',
-    points: 100,
-    room_id: 'example_room'
-  };
+
+  function generateId() {
+    let id = '';
+    const characters = '0123456789';
+    const charactersLength = characters.length;
+    
+    for (let i = 0; i < 10; i++) {
+      id += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    
+    return id;
+  }
+
 
   const userConnection = () => {
+    const userId = generateId()
     socket.current = new WebSocket("ws://localhost:5002");
     socket.current.onopen = () => {
       console.log('Connected')
@@ -24,13 +34,18 @@ const UserSignIn = () => {
       const message = {
         event: "connection",
         username,
-        id: Date.now(),
+        id: userId,
       };
       socket.current.send(JSON.stringify(message));
-      axios.post('http://localhost:5002/users', newUser)
+      axios.post('http://localhost:5002/users', {
+        username,
+        points: 0,
+        room_id: roomId,
+        id: userId,
+      })
       .then(response => {
         console.log('User created:', response.data);
-        navigate('/user-game');
+        navigate(`/user-game?roomId=${roomId}`);
       })
       .catch(error => {
         console.error('Error creating user:', error.response.data);
@@ -38,8 +53,6 @@ const UserSignIn = () => {
       
     };
     socket.current.onmessage = (event) => {
-      // const message = JSON.parse(event.data);
-      // setMessages((prev) => [message, ...prev]);
     };
 
     socket.current.onerror = () => {
@@ -55,6 +68,13 @@ const UserSignIn = () => {
       <img src={suLogo} alt='' className='user-sign__top-logo'></img>
       <img src={formLogo} alt='' className='user-sign__middle-logo'></img>
       <div className='user-sign__form-block'>
+        <input 
+          className='user-sign__form-input' 
+          type='text' 
+          placeholder='Введите номер игры'
+          value={roomId}
+          onChange={(e) => setRoomId(e.target.value)}
+        />
         <input 
           className='user-sign__form-input' 
           type='text' 
