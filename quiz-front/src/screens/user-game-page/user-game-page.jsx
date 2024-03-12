@@ -3,16 +3,54 @@ import './user-game-page.css'
 import Header from '../../components/header/header';
 import { useWebSocket } from '../../shared/WebSocketContext';
 import MembersTable from '../../components/members-table/members-table';
+import { useSearchParams } from 'react-router-dom';
+import axios from 'axios';
 
 const UserGamePage = () => {
-  const [members, setMembers] = useState([]);
+  const [searchParams] = useSearchParams();
+  const userId = searchParams.get('userId');
+  const roomId = searchParams.get('roomId');
+
   const [question, setQuestion] = useState();
   const [currentUser, setCurrentUser] = useState()
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
   const socket = useWebSocket();
+  const [userData, setUserData] = useState(null);
+
+
+  const fetchUserData = async () => {
+    try {
+      // Выполняем GET-запрос для получения информации о пользователе по его id
+      const response = await axios.get(`http://localhost:5002/user/${userId}`);
+      console.log('USER DATA BY ID', response.data)
+      // Устанавливаем полученные данные в state
+      setUserData(response.data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+    useEffect(() => {
+        const fetchGameData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5002/games/${roomId}`);
+                const gameData = response.data;
+                console.log('Game data:', gameData);
+                // Здесь вы можете обновить состояние вашего компонента с полученными данными
+            } catch (error) {
+                console.error('Error fetching game data:', error);
+            }
+        };
+
+        fetchGameData();
+
+        // В случае, если вы хотите выполнить запрос только при загрузке компонента,
+        // передайте пустой массив зависимостей в useEffect.
+    }, []);
 
   useEffect(() => {
-    
+    console.log("USER ID",userId)
+    fetchUserData()
     if (socket) {
       
       socket.onmessage = (event) => {
@@ -23,7 +61,7 @@ const UserGamePage = () => {
           console.log('connection')
           console.log('CURRENT USER', message)
           setCurrentUser(message)
-          setMembers(prevMessages => [...prevMessages, message]);
+        
         // eslint-disable-next-line eqeqeq
         } else if (message.event == 'start_game') {
           setQuestion(message.question)
@@ -35,7 +73,7 @@ const UserGamePage = () => {
         // Обработка входящего сообщения
       };
     }
-  }, [socket]);
+  }, []);
 
   const handleAnswerClick = () => {
     // console.log('Selected question:', gameQuestion);

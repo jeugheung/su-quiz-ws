@@ -20,9 +20,6 @@ const AdminAnswersPage = () => {
         const message = JSON.parse(event.data);
         console.log(message)
         if (message.event === 'connection') {
-          console.log('connection')
-          console.log('CURRENT USER', message)
-          setMembers(prevMessages => [...prevMessages, message]);
         } else if (message.event === 'start_game') {
           setQuestion(message.question)
           console.log('start_game----', question)

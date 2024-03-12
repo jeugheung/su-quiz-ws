@@ -45,7 +45,7 @@ const UserSignIn = () => {
       })
       .then(response => {
         console.log('User created:', response.data);
-        navigate(`/user-game?roomId=${roomId}`);
+        navigate(`/user-game?roomId=${roomId}&userId=${userId}`);
       })
       .catch(error => {
         console.error('Error creating user:', error.response.data);

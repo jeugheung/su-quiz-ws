@@ -132,6 +132,27 @@ app.get('/users/:room_id', async (req, res) => {
   }
 });
 
+app.get('/user/:userId', async (req, res) => {
+  try {
+    // Извлекаем id пользователя из параметра запроса
+    const userId = req.params.userId;
+
+    // Находим пользователя по его id
+    const user = await User.findOne({ 'userData': { $elemMatch: { user_id: userId } } });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Пользователь не найден' });
+    }
+
+    // Возвращаем найденного пользователя в ответе
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 app.post('/games', async (req, res) => {
   try {
     const { room_id, gameData } = req.body;
