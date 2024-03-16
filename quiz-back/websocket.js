@@ -87,44 +87,26 @@ app.get('/questions', async (req, res) => {
 
 app.post('/users', async (req, res) => {
   try {
-    // Проверяем, существует ли пользователь с данным room_id
-    const existingUser = await User.findOne({ room_id: req.body.room_id });
+    const newUser = new User({
+      room_id: req.body.room_id,
+      username: req.body.username,
+      points: req.body.points,
+      user_id: req.body.id
+    });
 
-    if (existingUser) {
-      // Если пользователь существует, добавляем нового пользователя в массив userData
-      existingUser.userData.push({
-        username: req.body.username,
-        points: req.body.points,
-        user_id: req.body.id
-      });
-
-      // Сохраняем обновленного пользователя
-      const savedUser = await existingUser.save();
-      res.status(201).json(savedUser);
-    } else {
-      // Если пользователь не существует, создаем нового пользователя
-      const newUser = new User({
-        room_id: req.body.room_id,
-        userData: [{
-          username: req.body.username,
-          points: req.body.points,
-          user_id: req.body.id
-        }]
-      });
-
-      // Сохраняем нового пользователя в базу данных
-      const savedUser = await newUser.save();
-      res.status(201).json(savedUser);
-    }
+    // Сохраняем нового пользователя в базе данных
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
+
 app.get('/users/:room_id', async (req, res) => {
   try {
-    const users = await User.findOne({ room_id: req.params.room_id });
+    const users = await User.find({ room_id: req.params.room_id });
     res.json(users);
   } catch (error) {
     console.error(error);
@@ -138,7 +120,7 @@ app.get('/user/:userId', async (req, res) => {
     const userId = req.params.userId;
 
     // Находим пользователя по его id
-    const user = await User.findOne({ 'userData': { $elemMatch: { user_id: userId } } });
+    const user = await User.findOne({user_id: req.params.userId});
 
     if (!user) {
       return res.status(404).json({ message: 'Пользователь не найден' });
@@ -160,10 +142,27 @@ app.post('/games', async (req, res) => {
 
     if (!existingGameData) {
       // Если данных для данной комнаты еще нет, создаем новую запись
-      existingGameData = new GameData({ room_id, gameData });
+      existingGameData = new GameData({ 
+        room_id,
+        current_question_ru: gameData.current_question_ru,
+        current_question_kz: gameData.current_question_kz,
+        question_id: gameData.question_id,
+        points: gameData.points,
+        category: gameData.category,
+        game_step: 0,
+        answers: [],
+        answered_count: 0
+      });
     } else {
       // Если данные уже существуют, обновляем их
-      existingGameData.gameData = gameData;
+      existingGameData.current_question_ru = gameData.current_question_ru;
+      existingGameData.current_question_kz = gameData.current_question_kz;
+      existingGameData.question_id = gameData.question_id;
+      existingGameData.game_step = gameData.game_step;
+      existingGameData.points = gameData.points;
+      existingGameData.category = gameData.category;
+      existingGameData.answers = gameData.answers;
+      existingGameData.answered_count = gameData.answered_count;
     }
 
     const savedGameData = await existingGameData.save();
@@ -173,6 +172,7 @@ app.post('/games', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 app.get('/games/:roomId', async (req, res) => {
   try {
@@ -187,6 +187,77 @@ app.get('/games/:roomId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+// Маршрут для обработки ответов пользователей
+app.post('/answer', async (req, res) => {
+  const { room_id, user_id, answer } = req.body;
+
+  try {
+    // Находим текущее состояние игры по room_id
+    const gameData = await GameData.findOne({ room_id });
+
+    if (!gameData) {
+      return res.status(404).json({ message: "Игра не найдена" });
+    }
+
+    // Проверяем, что пользователь еще не ответил на этот вопрос
+    const answeredUser = gameData.answers.find(a => a.user_id === user_id);
+    if (answeredUser) {
+      return res.status(400).json({ message: "Вы уже ответили на этот вопрос" });
+    }
+
+    // Добавляем ответ пользователя к текущему состоянию игры
+    gameData.answers.push({ user_id, answer });
+    gameData.answered_count += 1;
+
+    // Если уже ответили три пользователя, можем сделать что-то дальше
+    if (gameData.answered_count < 3) {
+      gameData.answers.push({ user_id, answer });
+      gameData.answered_count += 1;
+    } else {
+      return res.status(400).json({ message: "Достигнуто максимальное количество ответов" });
+    }
+    
+
+    // Сохраняем обновленное состояние игры
+    await gameData.save();
+
+    res.status(200).json({ message: "Ответ принят" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Ошибка сервера" });
+  }
+});
+
+module.exports = app;
+
+
+app.post('/updatePoints', async (req, res) => {
+  const { user_id, points } = req.body;
+
+  try {
+    // Находим пользователя по user_id
+    const user = await User.findOne({ user_id });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Пользователь не найден' });
+    }
+
+    // Обновляем количество баллов пользователя
+    user.points += points;
+
+    // Сохраняем обновленного пользователя
+    const updatedUser = await user.save();
+
+    res.status(200).json({ message: 'Количество баллов пользователя обновлено', user: updatedUser });
+  } catch (error) {
+    console.error('Ошибка при обновлении баллов пользователя:', error);
+    res.status(500).json({ message: 'Внутренняя ошибка сервера' });
+  }
+});
+
+
 
 
 

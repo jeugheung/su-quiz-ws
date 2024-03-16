@@ -16,6 +16,27 @@ const AdminDashboardPage = () => {
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get('roomId')
 
+  const [game, setGame] = useState()
+
+  useEffect(() => {
+    const fetchGameData = async () => {
+        try {
+            const response = await axios.get(`http://localhost:5002/games/${roomId}`);
+            const gameData = response.data;
+            console.log('Game data:', gameData);
+            setGame(gameData)
+            // Здесь вы можете обновить состояние вашего компонента с полученными данными
+        } catch (error) {
+            console.error('Error fetching game data:', error);
+        }
+    };
+
+    fetchGameData();
+
+    // В случае, если вы хотите выполнить запрос только при загрузке компонента,
+    // передайте пустой массив зависимостей в useEffect.
+  }, []);
+
   const handleStartGame = () => {
     console.log('Selected question:', gameQuestion);
     if (socket && gameQuestion) {
@@ -24,11 +45,16 @@ const AdminDashboardPage = () => {
         question: gameQuestion
       };
       socket.send(JSON.stringify(message));
+      console.log(game)
       const gameData = {
         current_question_ru: gameQuestion.question_ru,
         current_question_kz: gameQuestion.question_kz,
         question_id: gameQuestion.id,
-        game_step: 1
+        points: gameQuestion.points,
+        category: gameQuestion.category,
+        game_step: game.game_step + 1,
+        answers: [],
+        answered_count: 0
       };
   
       try {

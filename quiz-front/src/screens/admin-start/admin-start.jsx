@@ -23,6 +23,8 @@ const AdminStartPage = () => {
       current_question_ru: '',
       current_question_kz: '',
       question_id: 0,
+      points: 0,
+      category: '',
       game_step: 0
     };
 
