@@ -47,8 +47,9 @@ const AdminDashboardPage = () => {
         event: "start_game",
         question: gameQuestion
       };
-      // socket.send(JSON.stringify(message));
-      // console.log(game)
+      console.log('messagee',message)
+      socket.send(JSON.stringify(message));
+      console.log(game)
       const gameData = {
         current_question_ru: gameQuestion.question_ru,
         current_question_kz: gameQuestion.question_kz,

@@ -73,18 +73,6 @@ app.get('/questions', async (req, res) => {
   }
 });
 
-// app.get('/users', async (req, res) => {
-//   try {
-//     // Находим всех пользователей
-//     const users = await User.find();
-//     console.log('users')
-//     res.json(users); // Отправляем найденных пользователей в формате JSON
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// });
-
 app.post('/users', async (req, res) => {
   try {
     const newUser = new User({

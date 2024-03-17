@@ -31,7 +31,9 @@ const GameHeader = () => {
         <div className='game-header'>
             <div className='game-header__container'>
                 <h3>Номер комнаты {roomId}</h3>
-                <h3>Номер хода {gameData ? gameData.game_step : '-'}</h3>
+                <div>Номер хода  
+                    <span>{gameData ? gameData.game_step : '-'}</span>
+                </div>
             </div>
         </div>
     );

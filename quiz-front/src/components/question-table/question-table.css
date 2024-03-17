@@ -14,7 +14,7 @@
 }
 
 .question-table__main-title {
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 600;
   color: rgba(39, 87, 161, 1);
   line-height: 35px;
@@ -71,4 +71,9 @@
   min-height: 500px;
   align-items: center;
   justify-content: center;
+}
+
+.question-table__pointTitle {
+  font-weight: 700;
+  font-size: 17px;
 }

@@ -5,6 +5,7 @@ import Header from '../../components/header/header';
 import { useWebSocket } from '../../shared/WebSocketContext';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import {ThreeCircles} from 'react-loader-spinner'
 
 const AdminAnswersPage = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const AdminAnswersPage = () => {
   const roomId = searchParams.get('roomId');
   const [selectedItem, setSelectedItem] = useState(null);
   const [gameData, setGameData] = useState();
+  const [loading, setLoading] = useState(true)
 
   const socket = useWebSocket();
 
@@ -67,6 +69,9 @@ const AdminAnswersPage = () => {
             console.log('Game data:', gameData);
             setGameData(gameData)
             setQuestion(gameData)
+            setTimeout(() => {
+              setLoading(false);
+            }, 500)
             // Здесь вы можете обновить состояние вашего компонента с полученными данными
         } catch (error) {
             console.error('Error fetching game data:', error);
@@ -102,12 +107,32 @@ const AdminAnswersPage = () => {
   //   }
   // }, [socket]);
 
+  if (loading) {
+    return (
+      <div className='answers-loader-container'>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#4fa94d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
 
   return (
     <main className='user-game'>
       <Header />
       <div className='user-game__container'>
+
         <div className='user-game__question-container'>
+          <div>
+            <span>Номер комнаты {roomId}</span>
+            <span>Номер хода {gameData ? gameData.game_step : ''}</span>
+          </div>
           {question ? (
             <div className='user-game__question'>
               <span className='user-game__points'>Вопрос на {question.points}</span>
@@ -128,7 +153,7 @@ const AdminAnswersPage = () => {
             </div>
           )}
           <div className='user-game__top-table'>
-            
+            <span className='user-game__answers-title'>Ответы участников</span>
             <div className='user-game__top-container'>
               {gameData && gameData.answers && (
                 gameData.answers.map((answer, index) => (

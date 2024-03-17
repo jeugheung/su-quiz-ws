@@ -1,8 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import './user-game-page.css'
 import Header from '../../components/header/header';
-import { useWebSocket } from '../../shared/WebSocketContext';
-import MembersTable from '../../components/members-table/members-table';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -12,9 +10,9 @@ const UserGamePage = () => {
   const roomId = searchParams.get('roomId');
 
   const [question, setQuestion] = useState();
-  const [currentUser, setCurrentUser] = useState()
+  // const [currentUser, setCurrentUser] = useState()
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
-  const socket = useWebSocket();
+  const socket = useRef();
   const [userData, setUserData] = useState(null);
   const [gameData, setGameData] = useState()
 
@@ -47,6 +45,7 @@ const UserGamePage = () => {
       };
 
       fetchGameData();
+      fetchUserData()
 
       // В случае, если вы хотите выполнить запрос только при загрузке компонента,
       // передайте пустой массив зависимостей в useEffect.
@@ -54,29 +53,38 @@ const UserGamePage = () => {
 
   useEffect(() => {
     console.log("USER ID",userId)
-    fetchUserData()
-    if (socket) {
-      
-      socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        console.log(message)
-        // eslint-disable-next-line eqeqeq
-        if (message.event == 'connection') {
-          console.log('connection')
-          console.log('CURRENT USER', message)
-          setCurrentUser(message)
-        
-        // eslint-disable-next-line eqeqeq
-        } else if (message.event == 'start_game') {
-          setQuestion(message.question)
-          console.log('start_game----', question)
-        } else if (message.event === 'user_answer') {
-          alert('OTVER')
-        }
-        
-        // Обработка входящего сообщения
-      };
+    socket.current = new WebSocket("ws://localhost:5002");
+    socket.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      console.log('Message from USE EFFECT user game', message);
+      if (message.event == 'start_game') {
+        setGameData(message.question)
+      }
     }
+    // fetchUserData()
+    // if (socket) {
+      
+    //   socket.onmessage = (event) => {
+    //     const message = JSON.parse(event.data);
+    //     console.log(message)
+    //     // eslint-disable-next-line eqeqeq
+    //     if (message.event == 'connection') {
+    //       console.log('connection')
+    //       console.log('CURRENT USER', message)
+    //       // setCurrentUser(message)
+        
+    //     // eslint-disable-next-line eqeqeq
+    //     } else if (message.event == 'start_game') {
+    //       setQuestion(message.question)
+    //       console.log('start_game----', question)
+    //     } else if (message.event === 'user_answer') {
+    //       alert('OTVER')
+    //     }
+        
+
+    //   };
+
+    // }
   }, []);
 
   const handleAnswerClick = () => {
@@ -151,14 +159,14 @@ const UserGamePage = () => {
             </div>
           </div>
 
-          <div className='user-game__divider'></div>
           {(gameData && gameData.game_step !== 0) ? (
             <div className='user-game__question'>
               <span className='user-game__points'>Вопрос на {gameData.points}</span>
               <div className='user-game__question-block'>
                 <span className='user-game__category'>Тема : {gameData.category}</span>
-                <span className='user-game__task'>{gameData.current_question_kz}</span>
-                <span className='user-game__task'>{gameData.current_question_ru}</span>
+                <span className='user-game__task'>{gameData.current_question_kz || gameData.question_kz}</span>
+                <div className='user-game__divider-line'></div>
+                <span className='user-game__task'>{gameData.current_question_ru || gameData.question_ru}</span>
               </div>
               {answerSubmitted ? (
                 <button className='user-game__reply-btn__submitted' disabled>Вы ответили</button>

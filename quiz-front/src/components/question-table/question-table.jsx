@@ -72,7 +72,7 @@ const QuestionTable = ({setGameQuestion}) => {
                 className={`question-table__question-item ${selectedQuestion && selectedQuestion.id === question.id ? 'selected' : ''}`}
                 onClick={() => handleQuestionClick(question)}
               >
-                <span>{question.points}</span>
+                <span className='question-table__pointTitle'>{question.points}</span>
                 <span>баллов</span>
               </div>
             ))}
