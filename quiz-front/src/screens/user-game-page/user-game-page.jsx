@@ -81,16 +81,18 @@ const UserGamePage = () => {
 
   const handleAnswerClick = () => {
     // console.log('Selected question:', gameQuestion);
-    if (socket && question) {
-      const message = {
-        event: "user_answer",
-        question: question,
-        user: currentUser
-      };
-      console.log(message)
-      // socket.send(JSON.stringify(message));
-      // setAnswerSubmitted(true);
-    }
+    // if (socket && question) {
+    //   const message = {
+    //     event: "user_answer",
+    //     question: question,
+    //     user: currentUser
+    //   };
+    //   console.log(message)
+    //   // socket.send(JSON.stringify(message));
+    //   // setAnswerSubmitted(true);
+      
+    // }
+
     const requestBody = {
       room_id: roomId,
       user_id: userId,
@@ -106,18 +108,23 @@ const UserGamePage = () => {
     })
     .then(response => {
       if (!response.ok) {
-        throw new Error('Ошибка HTTP: ' + response.status);
+        return response.json().then(errorData => {
+          throw new Error(errorData.message || 'Произошла ошибка на сервере');
+        });
       }
       return response.json();
     })
     .then(data => {
       console.log('Ответ сервера:', data);
+      setAnswerSubmitted(true)
     })
     .catch(error => {
       console.error('Ошибка запроса:', error.message);
+      alert(error.message); // Выводим сообщение об ошибке пользователю
     });
 
     console.log(requestBody)
+    
   }
 
   return (
@@ -156,7 +163,7 @@ const UserGamePage = () => {
               {answerSubmitted ? (
                 <button className='user-game__reply-btn__submitted' disabled>Вы ответили</button>
               ) : (
-                <button className='user-game__reply-btn' onClick={handleAnswerClick}>Ответить</button>
+                <button className='user-game__reply-btn' onClick={() => handleAnswerClick()}>Ответить</button>
               )}
             </div>
           ) : (

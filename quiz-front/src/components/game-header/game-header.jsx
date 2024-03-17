@@ -5,6 +5,7 @@ import axios from 'axios';
 
 const GameHeader = () => {
     const [searchParams] = useSearchParams();
+    const [gameData, setGameData] = useState()
     const roomId = searchParams.get('roomId')
 
     useEffect(() => {
@@ -12,7 +13,8 @@ const GameHeader = () => {
             try {
                 const response = await axios.get(`http://localhost:5002/games/${roomId}`);
                 const gameData = response.data;
-                console.log('Game data:', gameData);
+                console.log('Game data1313131:', gameData);
+                setGameData(gameData)
                 // Здесь вы можете обновить состояние вашего компонента с полученными данными
             } catch (error) {
                 console.error('Error fetching game data:', error);
@@ -29,7 +31,7 @@ const GameHeader = () => {
         <div className='game-header'>
             <div className='game-header__container'>
                 <h3>Номер комнаты {roomId}</h3>
-                <h3>Номер хода</h3>
+                <h3>Номер хода {gameData ? gameData.game_step : '-'}</h3>
             </div>
         </div>
     );

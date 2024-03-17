@@ -202,8 +202,8 @@ app.post('/answer', async (req, res) => {
     }
 
     // Проверяем, что пользователь еще не ответил на этот вопрос
-    const answeredUser = gameData.answers.find(a => a.user_id === user_id);
-    if (answeredUser) {
+    const isAnswered = gameData.answers.some(a => a.user_id === user_id && a.answer === answer);
+    if (isAnswered) {
       return res.status(400).json({ message: "Вы уже ответили на этот вопрос" });
     }
 
@@ -212,13 +212,11 @@ app.post('/answer', async (req, res) => {
     gameData.answered_count += 1;
 
     // Если уже ответили три пользователя, можем сделать что-то дальше
-    if (gameData.answered_count < 3) {
-      gameData.answers.push({ user_id, answer });
-      gameData.answered_count += 1;
-    } else {
+    if (gameData.answered_count > 3) {
       return res.status(400).json({ message: "Достигнуто максимальное количество ответов" });
+      // Ваша логика для обработки первых трех ответов
+      // Например, отправка уведомления о том, что ответили три пользователя
     }
-    
 
     // Сохраняем обновленное состояние игры
     await gameData.save();
@@ -230,7 +228,7 @@ app.post('/answer', async (req, res) => {
   }
 });
 
-module.exports = app;
+
 
 
 app.post('/updatePoints', async (req, res) => {

@@ -1,38 +1,72 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import './question-table.css'
+import {ThreeCircles} from 'react-loader-spinner'
 
 const QuestionTable = ({setGameQuestion}) => {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [questions, setQuestions] = useState([])
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5002/questions'); // Замените на ваш путь к GET-запросу
-        console.log('data from resp',response)
-        setQuestions(response.data)
+        const response = await axios.get('http://localhost:5002/questions');
+        console.log('All questions', response.data);
+        setQuestions(response.data);
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
+        // setLoading(false); // Устанавливаем значение загрузки как false после получения данных
       } catch (error) {
         console.error('Error fetching questions:', error);
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
+        // setLoading(false); // Устанавливаем значение загрузки как false в случае ошибки
       }
     };
 
     fetchData();
   }, []);
-  
+
   const handleQuestionClick = (question) => {
     setGameQuestion(question);
     setSelectedQuestion(question)
     // Дальнейшая обработка клика на вопрос
   };
 
+  const groupedQuestions = questions.reduce((acc, question) => {
+    if (!acc[question.category]) {
+      acc[question.category] = [];
+    }
+    acc[question.category].push(question);
+    return acc;
+  }, {});
+
+  if (loading) {
+    return (
+      <div className='loader-container'>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#4fa94d"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    );
+  }
+
   return (
     <div className='question-table'>
-      {questions.map((category) => (
-        <div key={category.category} className='question-table__content-container'>
-          <span className='question-table__main-title'>{category.category}</span>
+      {Object.entries(groupedQuestions).map(([category, questions]) => (
+        <div key={category} className='question-table__content-container'>
+          <span className='question-table__main-title'>{category}</span>
           <div className='question-table__question-stack'>
-            {category.questions.map((question) => (
+            {questions.map((question) => (
               <div
                 key={question.id}
                 className={`question-table__question-item ${selectedQuestion && selectedQuestion.id === question.id ? 'selected' : ''}`}
@@ -47,6 +81,7 @@ const QuestionTable = ({setGameQuestion}) => {
       ))}
     </div>
   );
+  
 }
 
 export default QuestionTable;

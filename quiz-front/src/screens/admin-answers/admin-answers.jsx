@@ -4,9 +4,10 @@ import './admin-answers.css'
 import Header from '../../components/header/header';
 import { useWebSocket } from '../../shared/WebSocketContext';
 import axios from 'axios';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const AdminAnswersPage = () => {
+  const navigate = useNavigate();
   const [members, setMembers] = useState([]);
   const [question, setQuestion] = useState();
   const [answers, setAnswers] = useState()
@@ -45,6 +46,9 @@ const AdminAnswersPage = () => {
     })
     .then(data => {
       console.log('Ответ сервера:', data);
+      navigate(`/admin-dashboard?roomId=${roomId}`)
+ 
+      
     })
     .catch(error => {
       console.error('Ошибка запроса:', error.message);
@@ -62,6 +66,7 @@ const AdminAnswersPage = () => {
             const gameData = response.data;
             console.log('Game data:', gameData);
             setGameData(gameData)
+            setQuestion(gameData)
             // Здесь вы можете обновить состояние вашего компонента с полученными данными
         } catch (error) {
             console.error('Error fetching game data:', error);
@@ -74,28 +79,28 @@ const AdminAnswersPage = () => {
     // передайте пустой массив зависимостей в useEffect.
 }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
     
-    if (socket) {
+  //   if (socket) {
       
-      socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        console.log(message)
-        if (message.event === 'connection') {
-        } else if (message.event === 'start_game') {
-          setQuestion(message.question)
-          console.log('start_game----', question)
-        } else if (message.event === 'user_answer') {
-          console.log('ANSWER ---- ', message.user.username)
-          setAnswers(message.user.username)
-          console.log('SETTING ANSWER---', answers)
-          setTopList(prevMessages => [...prevMessages, message]);
-        }
+  //     socket.onmessage = (event) => {
+  //       const message = JSON.parse(event.data);
+  //       console.log(message)
+  //       if (message.event === 'connection') {
+  //       } else if (message.event === 'start_game') {
+  //         setQuestion(message.question)
+  //         console.log('start_game----', question)
+  //       } else if (message.event === 'user_answer') {
+  //         console.log('ANSWER ---- ', message.user.username)
+  //         setAnswers(message.user.username)
+  //         console.log('SETTING ANSWER---', answers)
+  //         setTopList(prevMessages => [...prevMessages, message]);
+  //       }
         
-        // Обработка входящего сообщения
-      };
-    }
-  }, [socket]);
+  //       // Обработка входящего сообщения
+  //     };
+  //   }
+  // }, [socket]);
 
 
   return (
@@ -108,8 +113,8 @@ const AdminAnswersPage = () => {
               <span className='user-game__points'>Вопрос на {question.points}</span>
               <div className='user-game__question-block'>
                 <span className='user-game__category'>Тема : {question.category}</span>
-                <span className='user-game__task'>{question.question_kz}</span>
-                <span className='user-game__task'>{question.question_ru}</span>
+                <span className='user-game__task'>{question.current_question_kz}</span>
+                <span className='user-game__task'>{question.current_question_ru}</span>
               </div>
               {selectedItem ? (
                 <div className='admin-answers__end-step' onClick={handleEndStep}>Завершить ход</div>

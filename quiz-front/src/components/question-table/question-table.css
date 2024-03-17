@@ -27,8 +27,8 @@
 
 .question-table__question-item {
   display: flex;
-  width: 140px;
-  height: 92px;
+  width: 100px;
+  height: 90px;
   border-radius: 20px;
   flex-direction: column;
   gap: 5px;
@@ -62,4 +62,13 @@
 
 .question-table__question-item.selected {
   background-color: rgba(88, 152, 250, 1);
+}
+
+.loader-container {
+  display: flex;
+  background-color: #F5F5F5;
+  width: 100%;
+  min-height: 500px;
+  align-items: center;
+  justify-content: center;
 }
