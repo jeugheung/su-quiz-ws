@@ -13,6 +13,7 @@ const gameDataSchema = new mongoose.Schema({
   // Добавляем поля для хранения ответов и количества ответивших пользователей
   answers: [{
     user_id: String,
+    username: String,
     answer: String
   }],
   answered_count: { type: Number, default: 0 }

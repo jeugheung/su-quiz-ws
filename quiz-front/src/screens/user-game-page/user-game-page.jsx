@@ -3,6 +3,7 @@ import './user-game-page.css'
 import Header from '../../components/header/header';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { useWebSocket } from '../../shared/WebSocketContext';
 
 const UserGamePage = () => {
   const [searchParams] = useSearchParams();
@@ -54,57 +55,37 @@ const UserGamePage = () => {
   useEffect(() => {
     console.log("USER ID",userId)
     socket.current = new WebSocket("ws://localhost:5002");
-    socket.current.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      console.log('Message from USE EFFECT user game', message);
-      if (message.event == 'start_game') {
-        setGameData(message.question)
+    if (socket) {
+      socket.current.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        console.log('Message from USE EFFECT user game', message);
+        if (message.event == 'start_game') {
+          setGameData(message.question)
+          setAnswerSubmitted(false)
+        } else if (message.event == 'end_step') {
+          console.log(message.winner)
+          setGameData(null)
+          fetchUserData()
+        }
       }
     }
-    // fetchUserData()
-    // if (socket) {
-      
-    //   socket.onmessage = (event) => {
-    //     const message = JSON.parse(event.data);
-    //     console.log(message)
-    //     // eslint-disable-next-line eqeqeq
-    //     if (message.event == 'connection') {
-    //       console.log('connection')
-    //       console.log('CURRENT USER', message)
-    //       // setCurrentUser(message)
-        
-    //     // eslint-disable-next-line eqeqeq
-    //     } else if (message.event == 'start_game') {
-    //       setQuestion(message.question)
-    //       console.log('start_game----', question)
-    //     } else if (message.event === 'user_answer') {
-    //       alert('OTVER')
-    //     }
-        
 
-    //   };
-
-    // }
+    return () => {
+      socket.current.close();
+    };
+    
   }, []);
 
   const handleAnswerClick = () => {
-    // console.log('Selected question:', gameQuestion);
-    // if (socket && question) {
-    //   const message = {
-    //     event: "user_answer",
-    //     question: question,
-    //     user: currentUser
-    //   };
-    //   console.log(message)
-    //   // socket.send(JSON.stringify(message));
-    //   // setAnswerSubmitted(true);
+    // if (socket ) {
       
     // }
 
     const requestBody = {
       room_id: roomId,
       user_id: userId,
-      answer: 'a'
+      answer: 'a',
+      username: userData.username,
     };
 
     fetch('http://localhost:5002/answer', {
@@ -124,6 +105,12 @@ const UserGamePage = () => {
     })
     .then(data => {
       console.log('Ответ сервера:', data);
+      const message = {
+        event: "user_answer",
+        user: userData
+      };
+      console.log(message)
+      socket.current.send(JSON.stringify(message));
       setAnswerSubmitted(true)
     })
     .catch(error => {
@@ -131,7 +118,7 @@ const UserGamePage = () => {
       alert(error.message); // Выводим сообщение об ошибке пользователю
     });
 
-    console.log(requestBody)
+
     
   }
 

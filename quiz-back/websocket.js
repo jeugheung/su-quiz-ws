@@ -48,6 +48,9 @@ wss.on('connection', function connection(ws) {
       case 'user_answer':
         broadcastMessage(message)
         break;
+      case 'end_step':
+        broadcastMessage(message)
+        break;
       case 'connection':
         broadcastMessage(message)
         break;
@@ -179,7 +182,7 @@ app.get('/games/:roomId', async (req, res) => {
 
 // Маршрут для обработки ответов пользователей
 app.post('/answer', async (req, res) => {
-  const { room_id, user_id, answer } = req.body;
+  const { room_id, user_id, answer, username } = req.body;
 
   try {
     // Находим текущее состояние игры по room_id
@@ -196,7 +199,7 @@ app.post('/answer', async (req, res) => {
     }
 
     // Добавляем ответ пользователя к текущему состоянию игры
-    gameData.answers.push({ user_id, answer });
+    gameData.answers.push({ user_id, answer, username });
     gameData.answered_count += 1;
 
     // Если уже ответили три пользователя, можем сделать что-то дальше

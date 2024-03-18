@@ -129,6 +129,8 @@ const AdminDashboardPage = () => {
               )}
              
             </button>
+
+            <button className='dashboard__button-end'>Завершить игру</button>
           </div>
         </div>
       </div>

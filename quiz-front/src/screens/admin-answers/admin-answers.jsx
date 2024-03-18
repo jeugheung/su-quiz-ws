@@ -9,10 +9,11 @@ import {ThreeCircles} from 'react-loader-spinner'
 
 const AdminAnswersPage = () => {
   const navigate = useNavigate();
-  const [members, setMembers] = useState([]);
+
   const [question, setQuestion] = useState();
   const [answers, setAnswers] = useState()
-  const [topList, setTopList] = useState([])
+  // const [topList, setTopList] = useState([])
+  const [winner, setWinner] = useState()
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get('roomId');
   const [selectedItem, setSelectedItem] = useState(null);
@@ -22,9 +23,10 @@ const AdminAnswersPage = () => {
   const socket = useWebSocket();
 
 
-  const handleClick = (user_id) => {
+  const handleClick = (user_id, username) => {
     console.log('SELECTED WINNER',user_id)
     setSelectedItem(user_id);
+    setWinner(username)
   };
 
   const handleEndStep = () => {
@@ -48,6 +50,12 @@ const AdminAnswersPage = () => {
     })
     .then(data => {
       console.log('Ответ сервера:', data);
+      const message = {
+        event: "end_step",
+        winner: winner
+      };
+      console.log('messagee',message)
+      socket.send(JSON.stringify(message));
       navigate(`/admin-dashboard?roomId=${roomId}`)
  
       
@@ -68,6 +76,8 @@ const AdminAnswersPage = () => {
             const gameData = response.data;
             console.log('Game data:', gameData);
             setGameData(gameData)
+            setAnswers(gameData.answers)
+
             setQuestion(gameData)
             setTimeout(() => {
               setLoading(false);
@@ -84,28 +94,28 @@ const AdminAnswersPage = () => {
     // передайте пустой массив зависимостей в useEffect.
 }, []);
 
-  // useEffect(() => {
+  useEffect(() => {
     
-  //   if (socket) {
+    if (socket) {
       
-  //     socket.onmessage = (event) => {
-  //       const message = JSON.parse(event.data);
-  //       console.log(message)
-  //       if (message.event === 'connection') {
-  //       } else if (message.event === 'start_game') {
-  //         setQuestion(message.question)
-  //         console.log('start_game----', question)
-  //       } else if (message.event === 'user_answer') {
-  //         console.log('ANSWER ---- ', message.user.username)
-  //         setAnswers(message.user.username)
-  //         console.log('SETTING ANSWER---', answers)
-  //         setTopList(prevMessages => [...prevMessages, message]);
-  //       }
+      socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        console.log('from dash', message)
+        if (message.event === "user_answer") {
+          console.log(',es')
+          setAnswers(prevUsers => [...prevUsers, message.user]);
+        }
+        // } else if (message.event === 'user_answer') {
+        //   console.log('ANSWER ---- ', message.user.username)
+        //   setAnswers(message.user.username)
+        //   console.log('SETTING ANSWER---', answers)
+        //   setTopList(prevMessages => [...prevMessages, message]);
+        // }
         
-  //       // Обработка входящего сообщения
-  //     };
-  //   }
-  // }, [socket]);
+        // Обработка входящего сообщения
+      };
+    }
+  }, [socket]);
 
   if (loading) {
     return (
@@ -152,21 +162,30 @@ const AdminAnswersPage = () => {
               <span>Ожидайте ответа администратора</span>
             </div>
           )}
+
           <div className='user-game__top-table'>
             <span className='user-game__answers-title'>Ответы участников</span>
             <div className='user-game__top-container'>
-              {gameData && gameData.answers && (
-                gameData.answers.map((answer, index) => (
+              {answers && (
+                answers.map((answer, index) => (
                   <div key={index} className={`user-game__top-item ${selectedItem === index ? 'selected' : ''}`}>
                     <div className="user-game__top-user">
                       <div className="user-game__top-circle" style={{ backgroundColor: index === 0 ? 'green' : index === 1 ? 'red' : 'blue' }}>{index + 1}</div>
-                      <span>{answer.user_id}</span>
+                      <span className='user-game__username'>{answer.username}</span>
                     </div>
                     <div className="user-game__top-btns">
-                      <button className="user-game__correct-answer"  onClick={() => handleClick(answer.user_id)}>Правильно</button>
+                      <button className={`user-game__correct-answer ${selectedItem === answer.user_id ? 'selected' : ''}`} onClick={() => handleClick(answer.user_id, answer.username)}>
+                        {selectedItem ? 'Победитель' : 'Правильно'}
+                      </button>
                     </div>
                   </div>
                 ))
+              )}
+              {answers && (
+                <div>
+                  <button className='all-incorrect'>Все неправильно</button>
+
+                </div>
               )}
             </div>
 
