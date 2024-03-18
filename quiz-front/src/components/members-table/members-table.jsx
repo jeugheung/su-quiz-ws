@@ -10,10 +10,12 @@ const MembersTable = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true)
   const roomId = searchParams.get('roomId')
+  const apiUrl = process.env.REACT_APP_API
+  const socketUrl = process.env.REACT_APP_SOCKET
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`http://localhost:5002/users/${roomId}`);
+      const response = await axios.get(`${apiUrl}/users/${roomId}`);
       console.log('userdata', response.data)
       setUsers(response.data);
       setTimeout(() => {
@@ -33,7 +35,7 @@ const MembersTable = () => {
   }, []);
 
   useEffect(() => {
-    socket.current = new WebSocket("ws://localhost:5002");
+    socket.current = new WebSocket(socketUrl);
     socket.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
       console.log('Message from USE EFFECT', message);

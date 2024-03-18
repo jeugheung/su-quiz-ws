@@ -5,9 +5,10 @@ const WebSocketContext = createContext(null);
 
 export const WebSocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
+  const socketUrl = process.env.REACT_APP_SOCKET
 
   useEffect(() => {
-    const newSocket = new WebSocket("ws://localhost:5002");
+    const newSocket = new WebSocket(socketUrl);
 
     newSocket.onopen = () => {
       console.log('WebSocket connected');

@@ -8,6 +8,7 @@ import axios from 'axios';
 const AdminStartPage = () => {
   const socket = useRef();
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API
   
 
   function generateRandomDigits() {
@@ -30,7 +31,7 @@ const AdminStartPage = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:5002/games', {
+      const response = await axios.post(`${apiUrl}/games`, {
         room_id: roomId,
         gameData: gameData
       });

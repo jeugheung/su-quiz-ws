@@ -7,11 +7,12 @@ const GameHeader = () => {
     const [searchParams] = useSearchParams();
     const [gameData, setGameData] = useState()
     const roomId = searchParams.get('roomId')
+    const apiUrl = process.env.REACT_APP_API
 
     useEffect(() => {
         const fetchGameData = async () => {
             try {
-                const response = await axios.get(`http://localhost:5002/games/${roomId}`);
+                const response = await axios.get(`${apiUrl}/games/${roomId}`);
                 const gameData = response.data;
                 console.log('Game data1313131:', gameData);
                 setGameData(gameData)

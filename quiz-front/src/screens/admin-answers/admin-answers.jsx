@@ -21,6 +21,8 @@ const AdminAnswersPage = () => {
   const [loading, setLoading] = useState(true)
 
   const socket = useWebSocket();
+  const apiUrl = process.env.REACT_APP_API
+  const socketUrl = process.env.REACT_APP_SOCKET
 
 
   const handleClick = (user_id, username) => {
@@ -31,7 +33,7 @@ const AdminAnswersPage = () => {
 
   const toggleAnswerStatus = async (questionId) => {
     try {
-      const response = await fetch(`http://localhost:5002/question/${questionId}`, {
+      const response = await fetch(`${apiUrl}/question/${questionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -46,6 +48,7 @@ const AdminAnswersPage = () => {
   
       const data = await response.json();
       console.log('Answer status toggled successfully:', data);
+      navigate(`/admin-dashboard?roomId=${roomId}`)
     } catch (error) {
       console.error('Error toggling answer status:', error);
     }
@@ -57,7 +60,7 @@ const AdminAnswersPage = () => {
       points: gameData.points // Количество баллов для добавления
     };
 
-    fetch('http://localhost:5002/updatePoints', {
+    fetch(`${apiUrl}/updatePoints`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -79,7 +82,6 @@ const AdminAnswersPage = () => {
       console.log('messagee',message)
       socket.send(JSON.stringify(message));
       toggleAnswerStatus(gameData.question_id)
-      navigate(`/admin-dashboard?roomId=${roomId}`)
  
       
     })
@@ -97,7 +99,7 @@ const AdminAnswersPage = () => {
   useEffect(() => {
     const fetchGameData = async () => {
         try {
-            const response = await axios.get(`http://localhost:5002/games/${roomId}`);
+            const response = await axios.get(`${apiUrl}/games/${roomId}`);
             const gameData = response.data;
             console.log('Game data:', gameData);
             setGameData(gameData)

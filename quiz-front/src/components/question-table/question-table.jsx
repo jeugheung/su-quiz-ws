@@ -7,11 +7,13 @@ const QuestionTable = ({setGameQuestion}) => {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(true);
+  const apiUrl = process.env.REACT_APP_API
+  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5002/questions');
+        const response = await axios.get(`${apiUrl}/questions`);
         console.log('All questions', response.data);
         setQuestions(response.data);
         setTimeout(() => {

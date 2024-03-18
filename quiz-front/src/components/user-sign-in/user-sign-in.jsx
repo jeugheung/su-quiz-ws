@@ -12,6 +12,9 @@ const UserSignIn = () => {
   const navigate = useNavigate();
   const socket = useRef();
 
+  const apiUrl = process.env.REACT_APP_API
+  const socketUrl = process.env.REACT_APP_SOCKET
+
   function generateId() {
     let id = '';
     const characters = '0123456789';
@@ -27,7 +30,7 @@ const UserSignIn = () => {
 
   const userConnection = () => {
     const userId = generateId()
-    socket.current = new WebSocket("ws://localhost:5002");
+    socket.current = new WebSocket(socketUrl);
     socket.current.onopen = () => {
       console.log('Connected')
       setConnected(true);
@@ -37,7 +40,7 @@ const UserSignIn = () => {
         id: userId,
       };
       socket.current.send(JSON.stringify(message));
-      axios.post('http://localhost:5002/users', {
+      axios.post(`${apiUrl}/users`, {
         username,
         points: 0,
         room_id: roomId,

@@ -14,10 +14,11 @@ const WinnerPage = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true)
   const roomId = searchParams.get('roomId')
+  const apiUrl = process.env.REACT_APP_API
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`http://localhost:5002/users/${roomId}`);
+      const response = await axios.get(`${apiUrl}/users/${roomId}`);
       console.log('userdata', response.data)
       setUsers(response.data);
       setTimeout(() => {
@@ -38,7 +39,7 @@ const WinnerPage = () => {
 
   const resetQuestions = async () => {
     try {
-      const response = await fetch('http://localhost:5002/questions/reset', {
+      const response = await fetch(`${apiUrl}/questions/reset`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

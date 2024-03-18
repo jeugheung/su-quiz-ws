@@ -19,11 +19,13 @@ const AdminDashboardPage = () => {
   const [loading, setLoading] = useState(false)
 
   const [game, setGame] = useState()
+  const apiUrl = process.env.REACT_APP_API
+  const socketUrl = process.env.REACT_APP_SOCKET
 
   useEffect(() => {
     const fetchGameData = async () => {
         try {
-            const response = await axios.get(`http://localhost:5002/games/${roomId}`);
+            const response = await axios.get(`${apiUrl}/games/${roomId}`);
             const gameData = response.data;
             console.log('Game data:', gameData);
             setGame(gameData)
@@ -73,7 +75,7 @@ const AdminDashboardPage = () => {
           })
         };
       
-        fetch('http://localhost:5002/games', requestOptions)
+        fetch(`${apiUrl}/games`, requestOptions)
           .then(response => {
             if (!response.ok) {
               throw new Error('Failed to save game data');

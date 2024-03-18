@@ -19,12 +19,13 @@ const UserGamePage = () => {
   const [gameData, setGameData] = useState()
 
   const [answerLoading, setAnswerLoading] = useState(false)
-
+  const apiUrl = process.env.REACT_APP_API
+  const socketUrl = process.env.REACT_APP_SOCKET
 
   const fetchUserData = async () => {
     try {
       // Выполняем GET-запрос для получения информации о пользователе по его id
-      const response = await axios.get(`http://localhost:5002/user/${userId}`);
+      const response = await axios.get(`${apiUrl}/user/${userId}`);
       console.log('USER DATA BY ID', response.data)
       // Устанавливаем полученные данные в state
       setUserData(response.data);
@@ -37,7 +38,7 @@ const UserGamePage = () => {
       const fetchGameData = async () => {
         try {
           const response = await axios.get(
-            `http://localhost:5002/games/${roomId}`
+            `${apiUrl}/games/${roomId}`
           );
           const gameData = response.data;
           console.log("Game data:", gameData);
@@ -57,7 +58,7 @@ const UserGamePage = () => {
 
   useEffect(() => {
     console.log("USER ID",userId)
-    socket.current = new WebSocket("ws://localhost:5002");
+    socket.current = new WebSocket(socketUrl);
     if (socket) {
       socket.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
@@ -88,7 +89,7 @@ const UserGamePage = () => {
       username: userData.username,
     };
 
-    fetch('http://localhost:5002/answer', {
+    fetch(`${apiUrl}/answer`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
