@@ -8,6 +8,7 @@ import axios from 'axios';
 const AdminStartPage = () => {
   const socket = useRef();
   const navigate = useNavigate();
+  
 
   function generateRandomDigits() {
     let result = '';

@@ -36,6 +36,27 @@ const WinnerPage = () => {
     fetchUsers();
   }, []);
 
+  const resetQuestions = async () => {
+    try {
+      const response = await fetch('http://localhost:5002/questions/reset', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.message); // Сообщение об успешном обновлении
+        navigate('/admin-start')
+      } else {
+        throw new Error('Failed to reset questions');
+      }
+    } catch (error) {
+      console.error('Error resetting questions:', error);
+    }
+  };
+  
+
 
   if (loading) {
     return (
@@ -79,7 +100,7 @@ const WinnerPage = () => {
 
           </div>
 
-          <button className='winner-page__end-game'>Завершить игру</button>
+          <button className='winner-page__end-game' onClick={resetQuestions}>Завершить игру</button>
         </div>
         
       </div>

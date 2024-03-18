@@ -16,7 +16,7 @@ const server = app.listen(5002, () => {
 });
 
 const wss = new ws.Server({
-  noServer: true, // Указываем, что WebSocket-сервер не должен создавать собственный HTTP-сервер
+  noServer: true,
 });
 
 server.on('upgrade', (request, socket, head) => {
@@ -24,10 +24,6 @@ server.on('upgrade', (request, socket, head) => {
     wss.emit('connection', ws, request);
   });
 });
-
-// const wss = new ws.Server({
-//   port: 5002,
-// }, () => console.log('Server WSS started at 5002'))
 
 const mongoUrl = "mongodb+srv://akartdev:myway25@cluster0.e4o2kx9.mongodb.net/quiz?retryWrites=true&w=majority"
 
@@ -179,37 +175,28 @@ app.get('/games/:roomId', async (req, res) => {
   }
 });
 
-
-// Маршрут для обработки ответов пользователей
 app.post('/answer', async (req, res) => {
   const { room_id, user_id, answer, username } = req.body;
 
   try {
-    // Находим текущее состояние игры по room_id
     const gameData = await GameData.findOne({ room_id });
 
     if (!gameData) {
       return res.status(404).json({ message: "Игра не найдена" });
     }
 
-    // Проверяем, что пользователь еще не ответил на этот вопрос
     const isAnswered = gameData.answers.some(a => a.user_id === user_id && a.answer === answer);
     if (isAnswered) {
       return res.status(400).json({ message: "Вы уже ответили на этот вопрос" });
     }
 
-    // Добавляем ответ пользователя к текущему состоянию игры
     gameData.answers.push({ user_id, answer, username });
     gameData.answered_count += 1;
 
-    // Если уже ответили три пользователя, можем сделать что-то дальше
     if (gameData.answered_count > 3) {
       return res.status(400).json({ message: "Достигнуто максимальное количество ответов" });
-      // Ваша логика для обработки первых трех ответов
-      // Например, отправка уведомления о том, что ответили три пользователя
     }
 
-    // Сохраняем обновленное состояние игры
     await gameData.save();
 
     res.status(200).json({ message: "Ответ принят" });
@@ -219,24 +206,18 @@ app.post('/answer', async (req, res) => {
   }
 });
 
-
-
-
 app.post('/updatePoints', async (req, res) => {
   const { user_id, points } = req.body;
 
   try {
-    // Находим пользователя по user_id
     const user = await User.findOne({ user_id });
 
     if (!user) {
       return res.status(404).json({ message: 'Пользователь не найден' });
     }
 
-    // Обновляем количество баллов пользователя
     user.points += points;
 
-    // Сохраняем обновленного пользователя
     const updatedUser = await user.save();
 
     res.status(200).json({ message: 'Количество баллов пользователя обновлено', user: updatedUser });
@@ -250,17 +231,13 @@ app.put('/question/:questionId', async (req, res) => {
   const questionId = req.params.questionId;
 
   try {
-    // Находим вопрос по его идентификатору
     const question = await Question.findOne({ id: questionId });
 
     if (!question) {
       return res.status(404).json({ message: 'Вопрос не найден' });
     }
 
-    // Инвертируем значение поля answered
     question.answered = !question.answered;
-
-    // Сохраняем обновленный вопрос
     await question.save();
 
     return res.status(200).json({ message: 'Статус ответа на вопрос успешно обновлен', question });
@@ -270,6 +247,15 @@ app.put('/question/:questionId', async (req, res) => {
   }
 });
 
+app.put('/questions/reset', async (req, res) => {
+  try {
+    const result = await Question.updateMany({}, { $set: { answered: false } });
+    res.status(200).json({ message: "All questions have been reset." });
+  } catch (error) {
+    console.error("Error updating questions:", error);
+    res.status(500).json({ message: "Failed to reset questions." });
+  }
+});
 
 
 
