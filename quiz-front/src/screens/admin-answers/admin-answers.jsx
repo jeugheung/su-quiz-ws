@@ -29,6 +29,28 @@ const AdminAnswersPage = () => {
     setWinner(username)
   };
 
+  const toggleAnswerStatus = async (questionId) => {
+    try {
+      const response = await fetch(`http://localhost:5002/question/${questionId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        // В теле запроса отправляем только идентификатор вопроса
+        body: JSON.stringify({ questionId })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to toggle answer status');
+      }
+  
+      const data = await response.json();
+      console.log('Answer status toggled successfully:', data);
+    } catch (error) {
+      console.error('Error toggling answer status:', error);
+    }
+  };
+
   const handleEndStep = () => {
     const requestBody = {
       user_id: selectedItem, // Замените на реальный user_id
@@ -56,6 +78,7 @@ const AdminAnswersPage = () => {
       };
       console.log('messagee',message)
       socket.send(JSON.stringify(message));
+      toggleAnswerStatus(gameData.question_id)
       navigate(`/admin-dashboard?roomId=${roomId}`)
  
       
@@ -63,6 +86,8 @@ const AdminAnswersPage = () => {
     .catch(error => {
       console.error('Ошибка запроса:', error.message);
     });
+
+  
 
     console.log(requestBody)
 

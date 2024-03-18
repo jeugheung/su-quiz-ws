@@ -4,6 +4,7 @@ import Header from '../../components/header/header';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { useWebSocket } from '../../shared/WebSocketContext';
+import {ThreeDots} from 'react-loader-spinner'
 
 const UserGamePage = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +17,8 @@ const UserGamePage = () => {
   const socket = useRef();
   const [userData, setUserData] = useState(null);
   const [gameData, setGameData] = useState()
+
+  const [answerLoading, setAnswerLoading] = useState(false)
 
 
   const fetchUserData = async () => {
@@ -77,10 +80,7 @@ const UserGamePage = () => {
   }, []);
 
   const handleAnswerClick = () => {
-    // if (socket ) {
-      
-    // }
-
+    setAnswerLoading(true)
     const requestBody = {
       room_id: roomId,
       user_id: userId,
@@ -111,10 +111,12 @@ const UserGamePage = () => {
       };
       console.log(message)
       socket.current.send(JSON.stringify(message));
+      setAnswerLoading(false)
       setAnswerSubmitted(true)
     })
     .catch(error => {
       console.error('Ошибка запроса:', error.message);
+      setAnswerLoading(false)
       alert(error.message); // Выводим сообщение об ошибке пользователю
     });
 
@@ -158,7 +160,22 @@ const UserGamePage = () => {
               {answerSubmitted ? (
                 <button className='user-game__reply-btn__submitted' disabled>Вы ответили</button>
               ) : (
-                <button className='user-game__reply-btn' onClick={() => handleAnswerClick()}>Ответить</button>
+                <button className='user-game__reply-btn' onClick={() => handleAnswerClick()}>
+                  {answerLoading ? (
+                    <ThreeDots
+                      visible={true}
+                      height="60"
+                      width="60"
+                      color="white"
+                      radius="9"
+                      ariaLabel="three-dots-loading"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  ) : (
+                    <span>Ответить</span>
+                  )}
+                </button>
               )}
             </div>
           ) : (

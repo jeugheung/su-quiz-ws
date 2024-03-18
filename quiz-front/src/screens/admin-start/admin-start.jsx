@@ -38,26 +38,6 @@ const AdminStartPage = () => {
     } catch (error) {
       console.error('Error saving or updating game data:', error);
     }
-    // socket.current = new WebSocket("ws://localhost:5002");
-    // socket.current.onopen = () => {
-    //   console.log('Connected')
-    //   const message = {
-    //     event: "connection",
-    //     username: `Администратор ${generateRandomDigits()}`,
-    //     id: 'admin',
-    //     room_id: generateRandomDigits()
-    //   };
-    //   socket.current.send(JSON.stringify(message));
-    //   navigate(`/admin-dashboard?roomId=${generateRandomDigits()}`)
-    // };
-    // socket.current.onmessage = (event) => {
-    //   // const message = JSON.parse(event.data);
-    //   // setMessages((prev) => [message, ...prev]);
-    // };
-
-    // socket.current.onerror = () => {
-    //   console.log("Socket произошла ошибка");
-    // };
   }
 
 

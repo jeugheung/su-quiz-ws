@@ -69,8 +69,8 @@ const QuestionTable = ({setGameQuestion}) => {
             {questions.map((question) => (
               <div
                 key={question.id}
-                className={`question-table__question-item ${selectedQuestion && selectedQuestion.id === question.id ? 'selected' : ''}`}
-                onClick={() => handleQuestionClick(question)}
+                className={`question-table__question-item ${selectedQuestion && selectedQuestion.id === question.id ? 'selected' : ''} ${question.answered ? 'answered' : ''}`}
+                onClick={() => !question.answered && handleQuestionClick(question)} 
               >
                 <span className='question-table__pointTitle'>{question.points}</span>
                 <span>баллов</span>

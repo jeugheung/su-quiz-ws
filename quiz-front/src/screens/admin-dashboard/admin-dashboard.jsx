@@ -99,6 +99,15 @@ const AdminDashboardPage = () => {
       }
     }
   };
+
+  const handleEndGame = () => {
+    const confirmed = window.confirm('Вы уверены, что хотите завершить игру?');
+
+    if (confirmed) {
+      // Здесь добавьте код для перехода на следующую страницу
+      navigate(`/winner-page?roomId=${roomId}`)
+    }
+  };
   
 
   return (
@@ -123,14 +132,12 @@ const AdminDashboardPage = () => {
                   wrapperClass=""
                 />
               ) : (
-                <button className='dashboard__button' onClick={handleStartGame}>
-                  Начать игру
-                </button>
+                <span> Начать игру</span>
               )}
              
             </button>
 
-            <button className='dashboard__button-end'>Завершить игру</button>
+            <button className='dashboard__button-end' onClick={handleEndGame}>Завершить игру</button>
           </div>
         </div>
       </div>

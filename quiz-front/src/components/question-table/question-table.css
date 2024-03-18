@@ -77,3 +77,9 @@
   font-weight: 700;
   font-size: 17px;
 }
+
+.question-table__question-item.answered {
+  background-color: gray;
+  cursor: not-allowed;
+  /* Стили для элемента, на который уже был дан ответ */
+}

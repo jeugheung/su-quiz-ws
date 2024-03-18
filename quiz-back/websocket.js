@@ -246,6 +246,29 @@ app.post('/updatePoints', async (req, res) => {
   }
 });
 
+app.put('/question/:questionId', async (req, res) => {
+  const questionId = req.params.questionId;
+
+  try {
+    // Находим вопрос по его идентификатору
+    const question = await Question.findOne({ id: questionId });
+
+    if (!question) {
+      return res.status(404).json({ message: 'Вопрос не найден' });
+    }
+
+    // Инвертируем значение поля answered
+    question.answered = !question.answered;
+
+    // Сохраняем обновленный вопрос
+    await question.save();
+
+    return res.status(200).json({ message: 'Статус ответа на вопрос успешно обновлен', question });
+  } catch (error) {
+    console.error('Ошибка при обновлении статуса ответа на вопрос:', error);
+    return res.status(500).json({ message: 'Ошибка сервера при обновлении статуса ответа на вопрос' });
+  }
+});
 
 
 
