@@ -47,3 +47,11 @@
 .user-sign__form-btn:hover {
   opacity: 0.8;
 }
+
+.user-sign__form-btn-admin {
+  height: 20px;
+  background-color: transparent;
+  color: gray;
+  border: 0;
+  cursor: pointer;
+}

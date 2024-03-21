@@ -27,6 +27,10 @@ const UserSignIn = () => {
     return id;
   }
 
+  const userAdmin = () => {
+    navigate('/admin');
+  }
+
 
   const userConnection = () => {
     const userId = generateId()
@@ -86,6 +90,7 @@ const UserSignIn = () => {
           onChange={(e) => setUsername(e.target.value)}
         />
         <button className='user-sign__form-btn' onClick={userConnection}>Войти</button>
+        <button className='user-sign__form-btn-admin' onClick={userAdmin}>Администратор</button>
       </div>
     </div>
   );

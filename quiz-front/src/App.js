@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { WebSocketProvider } from './shared/WebSocketContext';
 import HomePage from './screens/home-page/home-page';
 import AdminPage from './screens/admin/admin-page';
@@ -11,7 +11,7 @@ import WinnerPage from './screens/winners-page/winners-page';
 
 const App = () => {
   return (
-    <Router>
+    <BrowserRouter>
       <WebSocketProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -23,7 +23,7 @@ const App = () => {
           <Route path='winner-page' element={<WinnerPage />}/>
         </Routes>
       </WebSocketProvider>
-    </Router>
+    </BrowserRouter>
   );
 };
 

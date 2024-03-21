@@ -1,5 +1,6 @@
 const express = require('express');
-const ws = require('ws');
+const http = require('http');
+const socketIo = require('socket.io');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Question = require('./models/question-model');
@@ -11,18 +12,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const server = app.listen(5002, () => {
+const server = http.createServer(app);
+
+server.listen(5002, () => {
   console.log('Express server started on port 5002');
 });
 
-const wss = new ws.Server({
-  noServer: true,
-});
-
-server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (ws) => {
-    wss.emit('connection', ws, request);
-  });
+const io = require('socket.io')(server, {
+  cors: {
+    origin: 'http://localhost:4000', // Указываем домен вашего фронтенда
+    methods: ['GET', 'POST'] // Указываем разрешенные методы запросов
+  }
 });
 
 const mongoUrl = "mongodb+srv://akartdev:myway25@cluster0.e4o2kx9.mongodb.net/quiz?retryWrites=true&w=majority"
@@ -31,34 +31,34 @@ mongoose.connect(mongoUrl)
   .then(() => console.log('Connected to MongoDB'))
   .catch((error) => console.log('MongoDB connection error:', error));
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function(message) {
-    message = JSON.parse(message)
-    switch (message.event) {
-      case 'message': 
-        broadcastMessage(message)
-        break;
-      case 'start_game': 
-        broadcastMessage(message)
-        break;
-      case 'user_answer':
-        broadcastMessage(message)
-        break;
-      case 'end_step':
-        broadcastMessage(message)
-        break;
-      case 'connection':
-        broadcastMessage(message)
-        break;
-    }
-  })
+
+io.on('connection', function(socket) {
+    socket.on('message', function(message) {
+      message = JSON.parse(message)
+      switch (message.event) {
+        case 'message': 
+          broadcastMessage(message)
+          break;
+        case 'start_game': 
+          broadcastMessage(message)
+          break;
+        case 'user_answer':
+          broadcastMessage(message)
+          break;
+        case 'end_step':
+          broadcastMessage(message)
+          break;
+        case 'connection':
+          broadcastMessage(message)
+          break;
+      }
+    })
 })
 
 function broadcastMessage(message) {
-  wss.clients.forEach(client => {
-    client.send(JSON.stringify(message))
-  })
+  io.emit('message', JSON.stringify(message));
 }
+
 
 app.get('/questions', async (req, res) => {
   try {
